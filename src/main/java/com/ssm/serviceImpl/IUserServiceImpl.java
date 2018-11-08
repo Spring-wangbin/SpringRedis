@@ -22,7 +22,7 @@ import com.ssm.service.IUserService;
  */
 @Service("userService")
 @Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
-public class UserServiceImpl implements IUserService {
+public class IUserServiceImpl implements IUserService {
 
     @Resource
     private UserMapper iUserDao;
