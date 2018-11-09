@@ -20,7 +20,7 @@ import java.util.List;
 public class UserController {
 
     @Resource
-    private IUserService userService;
+    private IUserService iUserService;
 
     /**
      * 查询所有User
@@ -33,7 +33,7 @@ public class UserController {
     public String showUsers(Model model){
         System.out.println("**********showUsers********");
         List<User> userList = new ArrayList<User>();
-        userList = userService.getAllUser();
+        userList = iUserService.getAllUser();
         model.addAttribute("userList", userList); // 填充数据到model
         return "showUser";
     }
@@ -55,7 +55,7 @@ public class UserController {
         user.setsex(sex);
         user.setUserName(userName);
         user.setAge(age);
-        userService.insertUser(user);
+        iUserService.insertUser(user);
         ModelMap model = new ModelMap();
         model.addAttribute("result", "添加成功");
         return model;
@@ -69,10 +69,10 @@ public class UserController {
     @RequestMapping(value = "/delUser/{userID}", method = RequestMethod.GET)
     public ModelAndView delUser(@PathVariable int userID) {
         System.out.println(userID);
-        userService.deleteUser(userID);
+        iUserService.deleteUser(userID);
         ModelAndView mv = new ModelAndView();
         List<User> userList = new ArrayList<User>();
-        userList = userService.getAllUser();
+        userList = iUserService.getAllUser();
         mv.addObject("userList", userList); // 填充数据到model
         mv.setViewName("showUser");
         return mv;
@@ -89,7 +89,7 @@ public class UserController {
     public String findUsers(Model model, String keyWords) {
         System.out.println(keyWords);
         List<User> userList = new ArrayList<User>();
-        userList = userService.findUsers(keyWords);
+        userList = iUserService.findUsers(keyWords);
         model.addAttribute("userList", userList); // 填充数据到model
         return "showUser";
     }
@@ -110,10 +110,10 @@ public class UserController {
         user.setUserName(userName);
         user.setAge(age);
         user.setId(id);
-        userService.editUser(user);
+        iUserService.editUser(user);
         ModelAndView mv = new ModelAndView();
         List<User> userList = new ArrayList<User>();
-        userList = userService.getAllUser();
+        userList = iUserService.getAllUser();
         mv.addObject("userList", userList); // 填充数据到model
         mv.setViewName("redirect:/UserCRUD/showUser");
         return mv;

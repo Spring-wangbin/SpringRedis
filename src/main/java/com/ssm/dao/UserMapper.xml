@@ -7,7 +7,7 @@
         <result column="age" property="age" jdbcType="INTEGER"/>
         <result column="sex" property="sex" jdbcType="VARCHAR"/>
     </resultMap>
-    <sql id="base_column_list">
+    <sql id="Base_Column_List">
         id,userName,age,sex
     </sql>
 
@@ -23,9 +23,7 @@
 
     <!-- 查询所有的user -->
     <select id="selectAllUser" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List" />
-        from tb_user
+        select * from tb_user
     </select>
 
     <!-- 添加一个用户 -->
