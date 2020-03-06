@@ -2,6 +2,7 @@ package com.ssm.service;
 
 import java.util.List;
 import com.ssm.pojo.User;
+import com.ssm.utils.database.DataSource;
 
 /**
  * user表的操作接口
@@ -20,7 +21,11 @@ public interface IUserService {
      * 查询所有的user
      * @return 返回userList
      */
+    @DataSource(name = "dataSource1")
     public List<User> getAllUser();
+
+    @DataSource(name = "dataSource2")
+    public List<User> getAllUser2();
 
     /**
      * 添加一个user

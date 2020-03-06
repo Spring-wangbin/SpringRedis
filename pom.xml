@@ -103,7 +103,7 @@
       <dependency>
           <groupId>org.mybatis</groupId>
           <artifactId>mybatis</artifactId>
-          <version>3.3.0</version>
+          <version>3.4.0</version>
       </dependency>
 
       <dependency>
@@ -136,10 +136,49 @@
           <artifactId>jedis</artifactId>
           <version>2.7.3</version>
       </dependency>
+
+      <dependency>
+          <groupId>javax.servlet</groupId>
+          <artifactId>javax.servlet-api</artifactId>
+          <version>4.0.1</version>
+      </dependency>
+
+      <dependency>
+          <groupId>com.microsoft.sqlserver</groupId>
+          <artifactId>sqljdbc4</artifactId>
+          <version>4.0</version>
+      </dependency>
+
+      <dependency>
+          <groupId>org.apache.geronimo.bundles</groupId>
+          <artifactId>aspectjweaver</artifactId>
+          <version>1.6.8_2</version>
+      </dependency>
   </dependencies>
 
   <build>
     <finalName>SpringRedis</finalName>
+
+      <resources>
+          <resource>
+              <directory>src/main/java</directory>
+
+              <includes>
+                  <include>**/*.properties</include>
+                  <include>**/*.xml</include>
+              </includes>
+              <filtering>false</filtering>
+          </resource>
+
+          <resource>
+              <directory>src/main/resources</directory>
+              <includes>
+                  <include>**/*.properties</include>
+                  <include>**/*.xml</include>
+              </includes>
+              <filtering>false</filtering>
+          </resource>
+      </resources>
     <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
       <plugins>
         <plugin>

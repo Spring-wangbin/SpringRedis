@@ -3,7 +3,7 @@
 <mapper namespace="com.ssm.dao.UserMapper">
     <resultMap id="BaseResultMap" type="com.ssm.pojo.User">
         <id column="id" property="id" jdbcType="INTEGER"/>
-        <result column="userName" property="userName" jdbcType="VARCHAR"/>
+        <result column="username" property="userName" jdbcType="VARCHAR"/>
         <result column="age" property="age" jdbcType="INTEGER"/>
         <result column="sex" property="sex" jdbcType="VARCHAR"/>
     </resultMap>
@@ -23,6 +23,10 @@
 
     <!-- 查询所有的user -->
     <select id="selectAllUser" resultMap="BaseResultMap">
+        select * from tb_user
+    </select>
+
+    <select id="selectAllUser2" resultMap="BaseResultMap">
         select * from tb_user
     </select>
 

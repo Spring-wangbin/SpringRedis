@@ -10,7 +10,7 @@
             http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
             http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
 
-    <context:component-scan base-package="com.ssm.serviceImpl"/>
+    <context:component-scan base-package="com.ssm.service.serviceImpl"/>
     <context:component-scan base-package="com.ssm.utils"/>
 
     <!--<context:property-placeholder location="classpath:jdbc.properties,redis.properties"/>-->
@@ -23,29 +23,60 @@
         </property>
     </bean>
 
-    <bean id="dataSource" class="org.apache.ibatis.datasource.pooled.PooledDataSource">
-        <property name="driver" value="com.mysql.jdbc.Driver"/>
-        <property name="url" value="jdbc:mysql://localhost:3306/test"/>
+    <bean id="dataSource1" class="org.apache.ibatis.datasource.pooled.PooledDataSource">
+        <property name="driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
+        <property name="url" value="jdbc:sqlserver://localhost:1433;DatabaseName=test"/>
+        <property name="username" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
+    </bean>
+    <bean id="dataSource2" class="org.apache.ibatis.datasource.pooled.PooledDataSource">
+        <property name="driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
+        <property name="url" value="jdbc:sqlserver://localhost:1433;DatabaseName=test2"/>
         <property name="username" value="${jdbc.username}" />
         <property name="password" value="${jdbc.password}" />
     </bean>
 
+    <!-- 配置多数据源映射关系 -->
+    <bean id="ds" class="com.ssm.utils.database.DynamicDataSource">
+        <property name="targetDataSources">
+            <map key-type="java.lang.String">
+                <entry key="dataSource1" value-ref="dataSource1"></entry>
+                <entry key="dataSource2" value-ref="dataSource2"></entry>
+            </map>
+        </property>
+        <!-- 默认目标数据源为你主库数据源 -->
+        <property name="defaultTargetDataSource" ref="dataSource1"/>
+    </bean>
+
     <!-- spring和MyBatis完美整合，不需要mybatis的配置映射文件 -->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-        <property name="dataSource" ref="dataSource"/>
+        <property name="dataSource" ref="ds"/>
         <!-- 自动扫描mapping.xml文件 <property name="mapperLocations" value="classpath:com/ssm/mapper/*.xml"></property> -->
+    </bean>
+
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="sqlSessionFactory" />
     </bean>
 
     <!--配置mapper.xml的扫描路径-->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage" value="com.ssm.dao"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
     </bean>
 
     <!-- transaction config related（事物相关配置）... start -->
     <tx:annotation-driven transaction-manager="transactionManager"/>
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="dataSource"/>
+        <property name="dataSource" ref="ds"/>
     </bean>
+
+    <bean id="dataSourceExchange" class="com.ssm.utils.database.DataSourceExchange"/>
+    <aop:config>
+        <aop:pointcut id="service" expression="execution(* com.ssm.service..*.*(..))"/>
+        <!--关键配置，切换数据源一定要比持久层代码更先执行（事务也算持久层代码）-->
+        <!--<aop:advisor advice-ref="txAdvice" pointcut-ref="service" order="2"/>-->
+        <aop:advisor advice-ref="dataSourceExchange" pointcut-ref="service" order="1"/>
+    </aop:config>
 
     <!-- 配置JedisPoolConfig实例 -->
     <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">

@@ -17,4 +17,6 @@ public interface UserMapper {
     public List<User> findUsers(String keyWords);
 
     public void editUser(User user);
+
+    public List<User> selectAllUser2();
 }

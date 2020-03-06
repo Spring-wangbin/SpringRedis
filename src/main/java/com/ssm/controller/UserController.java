@@ -2,6 +2,9 @@ package com.ssm.controller;
 
 import com.ssm.pojo.User;
 import com.ssm.service.IUserService;
+import com.ssm.utils.BeanHelper;
+import org.apache.ibatis.datasource.pooled.PooledDataSource;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -9,14 +12,21 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.context.support.XmlWebApplicationContext;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@RequestMapping("/userCURD")
+//@RequestMapping("/userCURD")
 public class UserController {
 
     @Resource
@@ -35,7 +45,75 @@ public class UserController {
         List<User> userList = new ArrayList<User>();
         userList = iUserService.getAllUser();
         model.addAttribute("userList", userList); // 填充数据到model
+        System.out.println(userList);
         return "showUser";
+    }
+
+    @RequestMapping(value = "/showUser2", method = RequestMethod.GET)
+    public String showUsers2(Model model){
+        System.out.println("**********showUsers2********");
+        List<User> userList = new ArrayList<User>();
+        userList = iUserService.getAllUser2();
+        model.addAttribute("userList", userList); // 填充数据到model
+        System.out.println(userList);
+        return "showUser";
+    }
+
+    @RequestMapping(value = "/APISTORE_GET", method = RequestMethod.GET)
+    @ResponseBody
+    public static String APISTORE_GET(String accountNo, String name, String idCard) {
+
+        //appcode查看地址 https://market.console.aliyun.com/imageconsole/
+        String appcode = "77acf435622d474bb686e36f11f02125";
+        //请求地址
+        String strUrl="https://tbank.market.alicloudapi.com/bankCheck";
+
+        String returnStr = null; // 返回结果定义
+        URL url = null;
+        HttpURLConnection httpURLConnection = null;
+        String params = null;
+        try {
+            params = "accountNo=6214830159118701";
+            params += "&name=张渊";
+            params += "&idCard=140781198410180133";  //可为空
+            url = new URL(strUrl + "?" + params);
+            httpURLConnection = (HttpURLConnection) url.openConnection();
+            httpURLConnection.setRequestProperty("Accept-Charset", "utf-8");
+            httpURLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            httpURLConnection.setRequestProperty("Authorization", "APPCODE " + appcode);
+            httpURLConnection.setDoOutput(true);
+            httpURLConnection.setDoInput(true);
+            httpURLConnection.setRequestMethod("GET"); // get方式
+            httpURLConnection.setUseCaches(false); // 不用缓存
+            httpURLConnection.connect();
+            System.out.println(httpURLConnection.getResponseCode());
+            System.out.println(httpURLConnection.getResponseMessage());
+            httpURLConnection.getErrorStream();
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(httpURLConnection.getInputStream(), "utf-8"));
+            StringBuffer buffer = new StringBuffer();
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line);
+            }
+
+            reader.close();
+            returnStr = buffer.toString();
+            System.out.println(returnStr);
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return null;
+        } finally {
+            if (httpURLConnection != null) {
+                httpURLConnection.disconnect();
+            }
+        }
+        return returnStr;
+    }
+
+    public static void main(String[] args) {
+        APISTORE_GET("","","");
     }
 
     /**
@@ -117,5 +195,20 @@ public class UserController {
         mv.addObject("userList", userList); // 填充数据到model
         mv.setViewName("redirect:/UserCRUD/showUser");
         return mv;
+    }
+
+    @RequestMapping("/refresh")
+    @ResponseBody
+    public void refresh(HttpServletRequest request){
+        XmlWebApplicationContext context =
+                (XmlWebApplicationContext) WebApplicationContextUtils
+                        .getWebApplicationContext(request.getServletContext());
+
+        /*XmlWebApplicationContext context = (XmlWebApplicationContext) BeanHelper.getApplicationContext();*/
+
+        PooledDataSource dataSource = (PooledDataSource) context.getBean("dataSource");
+        dataSource.setPassword("wangbin");
+        System.out.println(context);
+        context.refresh();
     }
 }

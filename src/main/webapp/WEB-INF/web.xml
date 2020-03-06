@@ -18,6 +18,11 @@
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
 
+  <!-- 自定义BeanHelper注入Spring Context -->
+  <listener>
+    <listener-class>com.ssm.listener.FounderContextListener</listener-class>
+  </listener>
+
   <filter>
     <filter-name>springfilter</filter-name>
     <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
